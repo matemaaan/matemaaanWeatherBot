@@ -1,7 +1,7 @@
 from config import TOKEN
 from config import WTOKEN
 
-import os
+import math
 import datetime
 import requests
 from aiogram import Bot, Dispatcher, executor, types
@@ -19,14 +19,14 @@ code_to_smile = {
     "Mist": "Туман \U0001F32B"
 }
 
-@dp.message.handler(commands=["start"])
+@dp.message_handler(commands=["start"])
 async def start_command(message: types.Message):
 	await message.reply("Привет! Напиши мне название города и я пришлю сводку погоды")
 
 @dp.message_handler()
 async def get_weather(message: types.Message):
     try:
-        response = requests.get(f"http://api.openweathermap.org/data/2.5/weather?q=москва&lang=ru&units=metric&appid={WTOKEN}")
+        response = requests.get(f"http://api.openweathermap.org/data/2.5/weather?q={message.text}&lang=ru&units=metric&appid={WTOKEN}")
         data = response.json()
         city = data["name"]
         cur_temp = data["main"]["temp"]
@@ -50,10 +50,10 @@ async def get_weather(message: types.Message):
             wd = "Посмотри в окно, я не понимаю, что там за погода..."
     except:
         await message.reply("Проверьте название города!")
-    await message.reply(f"{datetime.datetime.now().strftime('%Y-%m-%d %H:%M')}\n" \
-        f"Погода в городе: {city}\n Температура: {cur_weather}°C {wd}\n" \
-        f"Влажность: {humidity}%\n Давление: {math.ceil(pressure/1.333)} мм.рт.ст\n Ветер: {wind} м/с \n" \
-        f"Восход солнца: {sunrise_timestamp}\n Закат солнца: {sunset_timestamp}\n Продолжительность дня: {length_of_the_day}\n" \
+    await message.reply(f"{datetime.datetime.now().strftime('%Y-%m-%d %H:%M')}\n"\
+        f"Погода в городе: {city}\n Температура: {cur_temp}°C {wd}\n"\
+        f"Влажность: {humidity}%\n Давление: {math.ceil(pressure/1.333)} мм.рт.ст\n Ветер: {wind} м/с \n"\
+        f"Восход солнца: {sunrise_timestamp}\n Закат солнца: {sunset_timestamp}\n Продолжительность дня: {length_of_the_day}\n"\
         f"Хорошего дня!")
 
 if __name__ == "__main__":
